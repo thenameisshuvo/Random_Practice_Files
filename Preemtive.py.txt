@@ -1,0 +1,26 @@
+import heapq
+
+class Process:
+    def __init__(self, n, a, b, p): self.n, self.a, self.b, self.p, self.w, self.t = n, a, b, p, 0, 0
+    def __lt__(self, other): return self.p < other.p
+
+def preemptive_priority_scheduling(p):
+    h, t, c = [], 0, []
+
+    while p or h:
+        while p and p[0].a <= t: heapq.heappush(h, p.pop(0))
+
+        if h:
+            c_p = heapq.heappop(h)
+            c_p.w, t, c_p.b = t - c_p.a, t + 1, c_p.b - 1
+
+            if c_p.b == 0: c_p.t, c = t - c_p.a, c + [c_p]
+            else: heapq.heappush(h, c_p)
+        else: t = p[0].a
+
+    avg_w = sum(p.w for p in c) / len(c)
+    return avg_w
+
+# Example usage
+p = [Process("P1", 0, 5, 2), Process("P2", 2, 3, 1), Process("P3", 4, 6, 3), Process("P4", 6, 4, 4)]
+print("Average Waiting Time:", preemptive_priority_scheduling(p))
